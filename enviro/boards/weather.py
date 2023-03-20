@@ -192,6 +192,7 @@ def get_sensor_readings(seconds_since_last, is_usb_power):
 
   temperature = bme280_data[0]
   humidity = bme280_data[2]
+  pressure = bme280_data[1] / 100.0
 
   # Compensate for additional heating when on usb power - this also changes the
   # relative humidity value.
@@ -205,11 +206,18 @@ def get_sensor_readings(seconds_since_last, is_usb_power):
     logging.info(f"  - USB adjusted temperature: {temperature}")
     logging.info(f"  - USB adjusted humidity: {humidity}")
 
+  # Adjust pressure to calculated sea level value if set to in config  
+  if config.sea_level_pressure:
+    logging.info(f"  - recorded temperature: {temperature}")
+    logging.info(f"  - recorded pressure: {pressure}")
+    pressure = round(helpers.get_sea_level_pressure(pressure, temperature, config.height_above_sea_level), 2)
+    logging.info(f"  - calculated mean sea level pressure: {pressure}")
+
   from ucollections import OrderedDict
   return OrderedDict({
     "temperature": round(temperature, 2),
     "humidity": round(humidity, 2),
-    "pressure": round(bme280_data[1] / 100.0, 2),
+    "pressure": round(pressure, 2),
     "luminance": round(ltr_data[BreakoutLTR559.LUX], 2),
     "wind_speed": wind_speed(),
     "rain": rain,
