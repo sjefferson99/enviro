@@ -18,6 +18,17 @@ def add_missing_config_settings():
     warn_missing_config_setting("usb_power_temperature_offset")
     config.usb_power_temperature_offset = DEFAULT_USB_POWER_TEMPERATURE_OFFSET
 
+  try:
+    config.wunderground_id
+  except AttributeError:
+    warn_missing_config_setting("wunderground_id")
+    config.wunderground_id = None
+  
+  try:
+    config.wunderground_key
+  except AttributeError:
+    warn_missing_config_setting("wunderground_key")
+    config.wunderground_key = None
 
 def warn_missing_config_setting(setting):
     logging.warn(f"> config setting '{setting}' missing, please add it to config.py")
