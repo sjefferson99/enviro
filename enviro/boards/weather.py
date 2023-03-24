@@ -165,7 +165,11 @@ def wind_direction():
     last_index = closest_index
     loop += 1
 
-  return closest_index * 22.5
+  wind_direction = closest_index * 22.5
+
+  offset_wind_direction = (wind_direction + 360 + config.wind_direction_offset) % 360
+  
+  return offset_wind_direction
 
 def rainfall(seconds_since_last):
   amount = 0

@@ -30,6 +30,10 @@ def add_missing_config_settings():
     warn_missing_config_setting("height_above_sea_level")
     config.height_above_sea_level = 0
 
+    config.wind_direction_offset
+  except AttributeError:
+    warn_missing_config_setting("wind_direction_offset")
+    config.wind_direction_offset = DEFAULT_USB_POWER_TEMPERATURE_OFFSET
 
 def warn_missing_config_setting(setting):
     logging.warn(f"> config setting '{setting}' missing, please add it to config.py")
