@@ -19,6 +19,16 @@ def add_missing_config_settings():
     config.usb_power_temperature_offset = DEFAULT_USB_POWER_TEMPERATURE_OFFSET
 
   try:
+    config.wunderground_id
+  except AttributeError:
+    warn_missing_config_setting("wunderground_id")
+    config.wunderground_id = None
+  
+  try:
+    config.wunderground_key
+  except AttributeError:
+    warn_missing_config_setting("wunderground_key")
+    config.wunderground_key = None
     config.sea_level_pressure
   except AttributeError:
     warn_missing_config_setting("sea_level_pressure")
