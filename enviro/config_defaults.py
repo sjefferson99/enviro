@@ -29,6 +29,8 @@ def add_missing_config_settings():
   except AttributeError:
     warn_missing_config_setting("wunderground_key")
     config.wunderground_key = None
+  
+  try:
     config.sea_level_pressure
   except AttributeError:
     warn_missing_config_setting("sea_level_pressure")
@@ -39,7 +41,12 @@ def add_missing_config_settings():
   except AttributeError:
     warn_missing_config_setting("height_above_sea_level")
     config.height_above_sea_level = 0
-
+  
+  try:
+    config.utc_offset
+  except AttributeError:
+    warn_missing_config_setting("utc_offset")
+    config.utc_offset = 0
 
 def warn_missing_config_setting(setting):
     logging.warn(f"> config setting '{setting}' missing, please add it to config.py")
