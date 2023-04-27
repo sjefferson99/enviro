@@ -11,6 +11,7 @@ nickname = None
 # network access details
 wifi_ssid = None
 wifi_password = None
+wifi_country = "GB"
 
 # For local time corrections to daily rain logging (include DST)
 utc_offset = 1
