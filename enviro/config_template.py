@@ -64,7 +64,13 @@ moisture_target_b = 50
 moisture_target_c = 50
 
 # compensate for usb power
+# degrees to remove from measured temperature when running on USB
 usb_power_temperature_offset = 4.5
+
+# compensate for battery power (only on weather boards)
+# degrees to remove from measured temperature when running on battery
+# this will vary based on poll and wifi upload frequency with accumulated heat as these values increase
+battery_power_temperature_offset = 2.0
 
 # sea level pressure conversion (adjusts measured pressure output for mean sea level value)
 sea_level_pressure = False
