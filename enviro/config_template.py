@@ -83,3 +83,8 @@ height_above_sea_level = 0
 
 # offset up to +/- 360 degrees for wind direction if you can't reorientate the weather station
 wind_direction_offset = 0
+
+# QW/ST modules
+# These are modules supported out of the box, provide the I2C address if
+# connected or otherwise leave as None
+bme688_address = None

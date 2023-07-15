@@ -5,7 +5,7 @@ DEFAULT_USB_POWER_TEMPERATURE_OFFSET = 4.5
 DEFAULT_BATTERY_POWER_TEMPERATURE_OFFSET = 0.0
 DEFAULT_UTC_OFFSET = 0
 DEFAULT_UK_BST = True
-
+DEFAULT_BME688_ADDRESS = None
 
 def add_missing_config_settings():
   try:
@@ -74,6 +74,12 @@ def add_missing_config_settings():
   except AttributeError:
     warn_missing_config_setting("wifi_country")
     config.wifi_country = "GB"
+
+  try:
+    config.bme688_address
+  except AttributeError:
+    warn_missing_config_setting("bme688_address")
+    config.bme688_address = DEFAULT_BME688_ADDRESS
 
 def warn_missing_config_setting(setting):
     logging.warn(f"> config setting '{setting}' missing, please add it to config.py")
