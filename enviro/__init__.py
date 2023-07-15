@@ -35,7 +35,8 @@ def get_board():
 def get_qwst_modules():
   modules = []
   if config.bme688_address in i2c_devices:
-    modules.append{"bme688": config.bme688_address}
+    import enviro.qwst_modules.bme688 as bme688
+    modules.append({"name": "BME688", "include": bme688, "address": config.bme688_address})
   return modules
 
 # set up the activity led
@@ -376,7 +377,8 @@ def get_qwst_modules_readings():
   module_readings = {}
   modules = get_qwst_modules()
   for module in modules:
-    module_readings = module_readings | module.get_readings(i2c, modules[module])
+    logging.info(f"  - getting readings from module: {module['name']}")
+    module_readings = module_readings | module["include"].get_readings(i2c, module["address"])
   return module_readings
 
 # save the provided readings into a todays readings data file
