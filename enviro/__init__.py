@@ -2,6 +2,7 @@
 # ===========================================================================
 from enviro.constants import *
 from machine import Pin
+import config
 hold_vsys_en_pin = Pin(HOLD_VSYS_EN_PIN, Pin.OUT, value=True)
 
 # detect board model based on devices on the i2c bus and pin state
@@ -30,7 +31,13 @@ def get_board():
   if model == "urban":
     import enviro.boards.urban as board
   return board
-  
+
+def get_qwst_modules():
+  modules = []
+  if config.bme688_address in i2c_devices:
+    modules.append{"bme688": config.bme688_address}
+  return modules
+
 # set up the activity led
 # ===========================================================================
 from machine import PWM, Timer
@@ -355,6 +362,8 @@ def get_sensor_readings():
 
 
   readings = get_board().get_sensor_readings(seconds_since_last, vbus_present)
+  module_readings = get_qwst_modules_readings()
+  readings = readings | module_readings
   # readings["voltage"] = 0.0 # battery_voltage #Temporarily removed until issue is fixed
 
   # write out the last time log
@@ -362,6 +371,13 @@ def get_sensor_readings():
     timefile.write(now_str)  
 
   return readings
+
+def get_qwst_modules_readings():
+  module_readings = {}
+  modules = get_qwst_modules()
+  for module in modules:
+    module_readings = module_readings | module.get_readings(i2c, modules[module])
+  return module_readings
 
 # save the provided readings into a todays readings data file
 def save_reading(readings):
