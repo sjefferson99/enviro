@@ -6,6 +6,7 @@ DEFAULT_BATTERY_POWER_TEMPERATURE_OFFSET = 0.0
 DEFAULT_UTC_OFFSET = 0
 DEFAULT_UK_BST = True
 DEFAULT_BME688_ADDRESS = None
+DEFAULT_SECONDARY_DESTINATION = None
 
 def add_missing_config_settings():
   try:
@@ -26,6 +27,12 @@ def add_missing_config_settings():
   except AttributeError:
     warn_missing_config_setting("battery_power_temperature_offset")
     config.battery_power_temperature_offset = DEFAULT_BATTERY_POWER_TEMPERATURE_OFFSET
+
+  try:
+    config.secondary_destination
+  except AttributeError:
+    warn_missing_config_setting("secondary_destination")
+    config.secondary_destination = DEFAULT_SECONDARY_DESTINATION
 
   try:
     config.wunderground_id
