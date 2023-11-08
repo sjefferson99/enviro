@@ -17,6 +17,18 @@ def add_missing_config_settings():
   except AttributeError:
     warn_missing_config_setting("usb_power_temperature_offset")
     config.usb_power_temperature_offset = DEFAULT_USB_POWER_TEMPERATURE_OFFSET
+  
+  try:
+    config.run_continuously
+  except AttributeError:
+    warn_missing_config_setting("run_continuously")
+    config.run_continuously = False
+  
+  try:
+    config.enable_wind_gust
+  except AttributeError:
+    warn_missing_config_setting("enable_wind_gust")
+    config.enable_wind_gust = False
 
 
 def warn_missing_config_setting(setting):

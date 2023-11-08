@@ -54,3 +54,9 @@ moisture_target_c = 50
 
 # compensate for usb power
 usb_power_temperature_offset = 4.5
+
+# run continuously
+run_continuously = False
+
+# enable wind gust measurement - requires run continuously to be True and will do nothing if False.
+enable_wind_gust = False

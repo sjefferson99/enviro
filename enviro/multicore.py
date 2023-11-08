@@ -4,6 +4,13 @@ from machine import Pin
 import _thread
 from math import pi
 
+class Multicore_Weather:
+  def __init__(self) -> None:
+    pass
+
+  def init_multicore_loop(self):
+    pass
+
 class Multicore_Weather_Wind:
   def __init__(self) -> None:
     self.pending_wind_data_lock = _thread.allocate_lock()
