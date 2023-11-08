@@ -33,9 +33,12 @@ import os
 import config
 
 if config.run_continuously == True:
-  from enviro.multicore import Multicore_Weather
-  mw = Multicore_Weather()
-  mw.init_multicore_loop()
+  if enviro.model == "weather":
+    from enviro.multicore import Multicore_Weather
+    mw = Multicore_Weather()
+    mw.init_multicore_loop()
+  else:
+    enviro.halt("> multicore config is only compatible with weather boards")
 else:
   try:
     # initialise enviro
