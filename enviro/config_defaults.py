@@ -24,12 +24,6 @@ def add_missing_config_settings():
     warn_missing_config_setting("run_continuously")
     config.run_continuously = False
   
-  try:
-    config.enable_wind_gust
-  except AttributeError:
-    warn_missing_config_setting("enable_wind_gust")
-    config.enable_wind_gust = False
-
-
+  
 def warn_missing_config_setting(setting):
     logging.warn(f"> config setting '{setting}' missing, please add it to config.py")

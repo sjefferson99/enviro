@@ -1,14 +1,50 @@
 import _thread
-from time import ticks_ms, ticks_diff, time
+from time import ticks_ms, ticks_diff, time, gmtime
 from machine import Pin
 import _thread
 from math import pi
+import enviro
+import config
 
 class Multicore_Weather:
   def __init__(self) -> None:
+    self.mww = Multicore_Weather_Wind()
+    self.last_reading_minute = gmtime()[4]
+    self.target_reading_second_in_minute = 10
+    self.pending_upload = []
+
+  def init_multicore_minute_poll_loop(self) -> None:
+    enviro.connect_to_wifi()
+    enviro.sync_clock_from_ntp
+    self.mww.init_wind_poll_thread()
+
+    while True:
+      self.poll_rain_pin()
+      self.poll_wind_data_pending()
+
+      if self.last_reading_minute < gmtime()[4] and gmtime()[5] > self.target_reading_second_in_minute:
+        self.last_reading_minute = gmtime()[4]
+        self.take_readings()
+
+      self.upload_pending_readings()
+
+  def poll_rain_pin(self) -> None:
+    #as per enviro weather module
     pass
 
-  def init_multicore_loop(self):
+  def poll_wind_data_pending(self) -> None:
+    if self.mww.check_pending_wind_data_length() > 0:
+      for reading in self.mww.get_pending_data():
+        self.pending_upload.append(reading)
+    else:
+      return
+
+  def take_readings(self) -> None:
+    #as per enviro weather module - minuus wind
+    pass
+
+  def upload_pending_readings(self) -> None:
+    #as per enviro weather module - illuminate activity light for upload
     pass
 
 class Multicore_Weather_Wind:
