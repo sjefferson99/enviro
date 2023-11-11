@@ -4,14 +4,13 @@ from machine import Pin
 import _thread
 from math import pi
 import enviro
-import config
+from boards import weather
 
 class Multicore_Weather:
   def __init__(self) -> None:
     self.mww = Multicore_Weather_Wind()
     self.last_reading_minute = gmtime()[4]
     self.target_reading_second_in_minute = 10
-    self.pending_upload = []
 
   def init_multicore_minute_poll_loop(self) -> None:
     enviro.connect_to_wifi()
@@ -29,23 +28,26 @@ class Multicore_Weather:
       self.upload_pending_readings()
 
   def poll_rain_pin(self) -> None:
-    #as per enviro weather module
-    pass
+    weather.check_trigger()
 
   def poll_wind_data_pending(self) -> None:
     if self.mww.check_pending_wind_data_length() > 0:
-      for reading in self.mww.get_pending_data():
-        self.pending_upload.append(reading)
+      wind_data = self.mww.get_pending_data()
+      for reading in wind_data:
+        pass
+        del reading["timestamp"] # For now assume this polls quickly enough for the enviro timestamp to be accurate without refactoring that function
+        enviro.cache_upload(reading)
+      self.mww.clear_pending_data()
     else:
-      return
+      pass
 
   def take_readings(self) -> None:
-    #as per enviro weather module - minuus wind
-    pass
+    reading = enviro.get_sensor_readings()
+    enviro.cache_upload(reading)
 
   def upload_pending_readings(self) -> None:
-    #as per enviro weather module - illuminate activity light for upload
-    pass
+    if enviro.cached_upload_count() > 0:
+      enviro.upload_readings()
 
 class Multicore_Weather_Wind:
   def __init__(self) -> None:
@@ -184,11 +186,11 @@ class Multicore_Weather_Wind:
     average_wind = self.calculate_average_wind()
     gust_wind = self.determine_gust_wind()
 
-    return {"timestamp": time(), "avg_speed": average_wind, "gust_speed": gust_wind}
+    return {"timestamp": time(), "avg_wind_speed": average_wind, "gust_wind_speed": gust_wind}
   
   def get_pending_data(self) -> list:
     """
-    Returns a list of dictionaries {"timestamp" : time, "avg_speed" : wind_data[0], "gust_speed" : wind_data[1]}
+    Returns a list of dictionaries {"timestamp" : unixtimestamp, "avg_wind_speed" : float, "gust_wind_speed" : float}
     """
     with self.pending_wind_data_lock:
       pending_data = self.pending_wind_data
