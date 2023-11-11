@@ -138,3 +138,6 @@ rain.txt
 
 # Pycharm idea
 .idea/
+
+# VS Code micropico extension
+.micropico
