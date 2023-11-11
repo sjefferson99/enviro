@@ -56,4 +56,9 @@ moisture_target_c = 50
 usb_power_temperature_offset = 4.5
 
 # run continuously
+# this mode is required to log wind gust data
+# an upload destination is assumed as data will otherwise back up quickly
+# data is uploaded as available as wifi is always connected
+# polls for data default to 1 per minute
+# see documentation for more details
 run_continuously = False
