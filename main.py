@@ -31,11 +31,14 @@ sleep(0.5)
 import enviro
 import os
 import config
+from phew import logging
 
 if config.run_continuously == True:
   if enviro.model == "weather":
     from enviro.multicore import Multicore_Weather
+    logging.info("> Creating multicore object")
     mw = Multicore_Weather()
+    logging.info("> Starting multicore loop")
     mw.init_multicore_minute_poll_loop()
   else:
     enviro.halt("> multicore config is only compatible with weather boards")
