@@ -95,3 +95,11 @@ wind_direction_offset = 0
 # These are modules supported out of the box, provide the I2C address if
 # connected or otherwise leave as None
 bme688_address = None
+
+# run continuously
+# this mode is required to log wind gust data
+# an upload destination is assumed as data will otherwise back up quickly
+# data is uploaded as available as wifi is always connected
+# polls for data default to 1 per minute
+# see documentation for more details
+run_continuously = False

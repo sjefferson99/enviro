@@ -88,5 +88,12 @@ def add_missing_config_settings():
     warn_missing_config_setting("bme688_address")
     config.bme688_address = DEFAULT_BME688_ADDRESS
 
+  try:
+    config.run_continuously
+  except AttributeError:
+    warn_missing_config_setting("run_continuously")
+    config.run_continuously = False
+  
+
 def warn_missing_config_setting(setting):
     logging.warn(f"> config setting '{setting}' missing, please add it to config.py")
