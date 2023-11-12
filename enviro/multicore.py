@@ -4,7 +4,7 @@ from machine import Pin
 import _thread
 from math import pi
 import enviro
-from boards import weather
+from enviro.boards import weather
 
 class Multicore_Weather:
   def __init__(self) -> None:
