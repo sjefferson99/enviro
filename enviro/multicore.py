@@ -1,5 +1,5 @@
 import _thread
-from time import ticks_ms, ticks_diff, time, gmtime
+from time import ticks_ms, ticks_diff, time
 from machine import Pin
 import _thread
 from math import pi
@@ -9,45 +9,30 @@ from enviro.boards import weather
 class Multicore_Weather:
   def __init__(self) -> None:
     self.mww = Multicore_Weather_Wind()
-    self.last_reading_minute = gmtime()[4]
-    self.target_reading_second_in_minute = 10
 
-  def init_multicore_minute_poll_loop(self) -> None:
-    enviro.connect_to_wifi()
-    enviro.sync_clock_from_ntp
+  def init_multicore_poll_loop(self) -> None:
+    # enviro.connect_to_wifi() existing enviro NTP code connects to wifi unconditionally
+    enviro.sync_clock_from_ntp()
     self.mww.init_wind_poll_thread()
 
     while True:
       self.poll_rain_pin()
-      self.poll_wind_data_pending()
 
-      if self.last_reading_minute < gmtime()[4] and gmtime()[5] > self.target_reading_second_in_minute:
-        self.last_reading_minute = gmtime()[4]
-        self.take_readings()
-
-      self.upload_pending_readings()
+      if self.mww.check_pending_wind_data_length() > 0:
+        all_data = self.collect_all_data()
+        # Bouncing to disk maintains compatibility with original enviro code - no need to rewrite upload logic
+        enviro.cache_upload(all_data)
+        enviro.upload_readings()
 
   def poll_rain_pin(self) -> None:
     weather.check_trigger()
-
-  def poll_wind_data_pending(self) -> None:
-    if self.mww.check_pending_wind_data_length() > 0:
-      wind_data = self.mww.get_pending_data()
-      for reading in wind_data:
-        pass
-        del reading["timestamp"] # For now assume this polls quickly enough for the enviro timestamp to be accurate without refactoring that function
-        enviro.cache_upload(reading)
-      self.mww.clear_pending_data()
-    else:
-      pass
-
-  def take_readings(self) -> None:
-    reading = enviro.get_sensor_readings()
-    enviro.cache_upload(reading)
-
-  def upload_pending_readings(self) -> None:
-    if enviro.cached_upload_count() > 0:
-      enviro.upload_readings()
+  
+  def collect_all_data(self) -> dict:
+    sensors_reading = enviro.get_sensor_readings()
+    wind_data = self.mww.get_pending_data()[-1]
+    self.mww.clear_pending_data()
+    all_data = sensors_reading | wind_data
+    return all_data
 
 class Multicore_Weather_Wind:
   def __init__(self) -> None:
