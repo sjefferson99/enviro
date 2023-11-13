@@ -39,7 +39,7 @@ if config.run_continuously == True:
     logging.info("> Creating multicore object")
     mw = Multicore_Weather()
     logging.info("> Starting multicore loop")
-    mw.init_multicore_minute_poll_loop()
+    mw.init_multicore_poll_loop()
   else:
     enviro.halt("> multicore config is only compatible with weather boards")
 else:
