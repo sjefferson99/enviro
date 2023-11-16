@@ -37,8 +37,14 @@ def upload_reading(reading):
     if key == "sea_level_pressure":
       url += "&baromin=" + str(hpa_to_inches(value))
     
-    if key == "wind_speed":
+    if key == "wind_speed" and "avg_wind_speed" not in reading["readings"]:
       url += "&windspeedmph=" + str(metres_per_second_to_miles_per_hour(value))
+    
+    if key == "avg_wind_speed":
+      url += "&windspeedmph=" + str(metres_per_second_to_miles_per_hour(value))
+
+    if key == "gust_wind_speed":
+      url += "&windgustmph=" + str(metres_per_second_to_miles_per_hour(value))
 
     if key == "wind_direction":
       url += "&winddir=" + str(value)
