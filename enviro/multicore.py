@@ -48,7 +48,7 @@ class Multicore_Weather_Wind:
     self.WIND_CM_RADIUS = 7.0
     self.WIND_FACTOR = 0.0218
     self.pending_wind_data = []
-    self.debug = True
+    self.debug = False
     self.processing_overhead_poll_count = 0
     self.last_loop_overhead_ms = 0
     self.remaining_loop_overhead_ms = 0
@@ -160,7 +160,6 @@ class Multicore_Weather_Wind:
     for sample in list_of_sample_speeds_in_m_s:
         if sample > gust_wind_speed:
           gust_wind_speed = sample
-          logging.info(f"> sample {sample} is current gust speed")
 
     return gust_wind_speed
 
