@@ -256,6 +256,8 @@ def get_sensor_readings(seconds_since_last, is_usb_power):
     "dewpoint": round(helpers.calculate_dewpoint(temperature, humidity), 2)
   })
 
+  logging.info(f"  - wind speed: {readings['wind_speed']}, wind_dir: {readings['wind_direction']}")
+
   # Add adjusted pressure to calculated sea level value if set to in config
   if config.sea_level_pressure:
     logging.info(f"  - recorded temperature: {temperature}")
