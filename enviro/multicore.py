@@ -13,17 +13,21 @@ class Multicore_Weather:
 
   def init_multicore_poll_loop(self) -> None:
     # enviro.connect_to_wifi() existing enviro NTP code connects to wifi unconditionally
+    enviro.pulse_activity_led()
     enviro.sync_clock_from_ntp()
     self.mww.init_wind_poll_thread()
+    enviro.stop_activity_led()
 
     while True:
       self.poll_rain_pin()
 
       if self.mww.check_pending_wind_data_length() > 0:
+        enviro.activity_led(100) # Pulse crashes execution
         all_data = self.collect_all_data()
         # Bouncing to disk maintains compatibility with original enviro code - no need to rewrite upload logic
         enviro.cache_upload(all_data)
         enviro.upload_readings()
+        enviro.activity_led(0)
 
   def poll_rain_pin(self) -> None:
     weather.check_trigger()
