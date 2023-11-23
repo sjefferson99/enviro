@@ -56,11 +56,12 @@ class Multicore_Weather_Wind:
     self.processing_overhead_poll_count = 0
     self.last_loop_overhead_ms = 0
     self.remaining_loop_overhead_ms = 0
+    self.gust_rolling_average_duration_s = 3
   
   def init_wind_poll_thread(self) -> None:
     self.wind_poll_thread = _thread.start_new_thread(self.constant_poll_wind_speed, ())
 
-  def discard_overhead_compensation_poll(self) -> None:		
+  def discard_overhead_compensation_poll(self) -> None:
     if self.remaining_loop_overhead_ms >= self.sample_ms:
       self.remaining_loop_overhead_ms -= self.sample_ms
     else:
@@ -133,38 +134,37 @@ class Multicore_Weather_Wind:
     
     return wind_m_s
 
-  def convert_sample_list_ticks_to_average_ms(self, samples) -> list:
-    sample_average_tick_ms = []
-    for sample in samples:
-      if len(sample) > 1:
-        average_tick_ms = (ticks_diff(sample[-1], sample[0])) / (len(sample) - 1)
-        sample_average_tick_ms.append(average_tick_ms)
-      else:
-        sample_average_tick_ms.append(0)
-    
-    return sample_average_tick_ms
-  
-  def convert_sample_list_ms_to_speed_m_s(self, list_of_sample_average_ticks_in_ms) -> list:
-    sample_speeds_in_m_s = []
-    for sample in list_of_sample_average_ticks_in_ms:
-      if sample == 0:
-        sample_speeds_in_m_s.append(0)
-      else:
-        sample_speeds_in_m_s.append(self.calculate_wind_speed_m_s(sample))
-    
-    return sample_speeds_in_m_s
+  def calculate_average_wind(self, samples) -> float:
+    average_tick_ms = self.calculate_sample_set_average_duration_ms(samples)
+    average_wind_speed = self.calculate_wind_speed_m_s(average_tick_ms)
 
-  def calculate_average_wind(self, list_of_sample_speeds_in_m_s) -> float:
-    average_wind_speed = sum(list_of_sample_speeds_in_m_s) / len(list_of_sample_speeds_in_m_s)
-    
     return average_wind_speed
 
-  def determine_gust_wind(self, list_of_sample_speeds_in_m_s) -> float:
-    gust_wind_speed = 0
-    for sample in list_of_sample_speeds_in_m_s:
-        if sample > gust_wind_speed:
-          gust_wind_speed = sample
+  def calculate_sample_set_average_duration_ms(self, sample_set) -> float:    
+    ticks = []
+    for sample in sample_set:
+      for tick in sample:
+        ticks.append(tick)
+    
+    total_sample_set_ticks = len(ticks)
+    
+    if total_sample_set_ticks > 1:
+      total_sample_set_time = ticks[-1] - ticks[0]
+      average_sample_set_tick_duration_ms = total_sample_set_time / total_sample_set_ticks
+    else:
+      average_sample_set_tick_duration_ms = 0
 
+    return average_sample_set_tick_duration_ms
+
+  def determine_gust_wind(self, samples) -> float:
+    gust_wind_speed = 0
+    
+    for start_sample in range(len(samples) - (self.gust_rolling_average_duration_s * self.sample_hz)):
+      current_average_duration = self.calculate_sample_set_average_duration_ms(samples[start_sample:start_sample + (self.gust_rolling_average_duration_s * self.sample_hz)])
+      current_speed = self.calculate_wind_speed_m_s(current_average_duration)
+      if current_speed > gust_wind_speed:
+        gust_wind_speed = current_speed
+      
     return gust_wind_speed
 
   def cache_samples(self) -> None:
@@ -179,14 +179,9 @@ class Multicore_Weather_Wind:
     self.cache_samples()
     samples = self.remove_processing_overhead_data_polls(self.cached_samples)
 
-    list_of_sample_average_ticks_in_ms = self.convert_sample_list_ticks_to_average_ms(samples)
-    logging.info(f"> list of sample average ticks in ms: {list_of_sample_average_ticks_in_ms}")
-    list_of_sample_speeds_in_m_s = self.convert_sample_list_ms_to_speed_m_s(list_of_sample_average_ticks_in_ms)
-    logging.info(f"> list of sample wind speeds in m/s: {list_of_sample_speeds_in_m_s}")
-    
-    gust_wind = self.determine_gust_wind(list_of_sample_speeds_in_m_s)
+    gust_wind = self.determine_gust_wind(samples)
     logging.info(f"> gust wind speed is: {gust_wind}")
-    average_wind = self.calculate_average_wind(list_of_sample_speeds_in_m_s)    
+    average_wind = self.calculate_average_wind(samples)    
     logging.info(f"> average wind speed is: {average_wind}")
 
     return {"timestamp": time(), "avg_wind_speed": average_wind, "gust_wind_speed": gust_wind}
