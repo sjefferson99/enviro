@@ -142,8 +142,13 @@ i2c.writeto_mem(0x51, 0x00, b'\x00') # ensure rtc is running (this should be def
 rtc.enable_timer_interrupt(False)
 
 t = rtc.datetime()
+print(t)
+month = t[1]
+if month > 12:
+    month = 12
+print(month)
 # BUG ERRNO 22, EINVAL, when date read from RTC is invalid for the pico's RTC.
-RTC().datetime((t[0], t[1], t[2], t[6], t[3], t[4], t[5], 0)) # synch PR2040 rtc too
+RTC().datetime((t[0], month, t[2], t[6], t[3], t[4], t[5], 0)) # synch PR2040 rtc too
 
 # jazz up that console! toot toot!
 print("       ___            ___            ___          ___          ___            ___       ")
