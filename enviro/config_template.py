@@ -71,3 +71,6 @@ usb_power_temperature_offset = 4.5
 sea_level_pressure = False
 # height in metres
 height_above_sea_level = 0
+
+# offset up to +/- 360 degrees for wind direction if you can't reorientate the weather station
+wind_direction_offset = 0

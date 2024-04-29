@@ -4,7 +4,7 @@ from phew import logging
 DEFAULT_USB_POWER_TEMPERATURE_OFFSET = 4.5
 DEFAULT_UTC_OFFSET = 0
 DEFAULT_UK_BST = True
-
+DEFAULT_WIND_DIRECTION_OFFSET = 0
 
 def add_missing_config_settings():
   try:
@@ -19,7 +19,7 @@ def add_missing_config_settings():
   except AttributeError:
     warn_missing_config_setting("usb_power_temperature_offset")
     config.usb_power_temperature_offset = DEFAULT_USB_POWER_TEMPERATURE_OFFSET
-
+  
   try:
     config.wifi_country
   except AttributeError:
@@ -61,6 +61,12 @@ def add_missing_config_settings():
   except AttributeError:
     warn_missing_config_setting("utc_offset")
     config.utc_offset = DEFAULT_UTC_OFFSET
+
+  try:
+    config.wind_direction_offset
+  except AttributeError:
+    warn_missing_config_setting("wind_direction_offset")
+    config.wind_direction_offset = DEFAULT_WIND_DIRECTION_OFFSET
 
 def warn_missing_config_setting(setting):
     logging.warn(f"> config setting '{setting}' missing, please add it to config.py")
