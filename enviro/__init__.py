@@ -161,7 +161,7 @@ print("")
 print("    -  --  ---- -----=--==--===  hey enviro, let's go!  ===--==--=----- ----  --  -     ")
 print("")
 
-def reconnect_wifi(ssid, password, country):
+def reconnect_wifi(ssid, password, country, hostname=None):
   import time
   import network
   import math
@@ -172,6 +172,11 @@ def reconnect_wifi(ssid, password, country):
 
   # Set country
   rp2.country(country)
+
+  # Set hostname
+  if hostname is None:
+      hostname = f"EnviroW-{helpers.uid()[-4:]}"
+  network.hostname(hostname)
 
   # Reference: https://datasheets.raspberrypi.com/picow/connecting-to-the-internet-with-pico-w.pdf
   CYW43_LINK_DOWN = 0
@@ -221,7 +226,7 @@ def reconnect_wifi(ssid, password, country):
   
   # Disconnect when necessary
   status = dump_status()
-  if status >= CYW43_LINK_JOIN and status <= CYW43_LINK_UP:
+  if status >= CYW43_LINK_JOIN and status < CYW43_LINK_UP:
     logging.info("> Disconnecting...")
     wlan.disconnect()
     try:
@@ -434,7 +439,7 @@ def get_qwst_modules_readings():
 def save_reading(readings):
   # open todays reading file and save readings
   helpers.mkdir_safe("readings")
-  readings_filename = f"readings/{helpers.datetime_file_string()}.txt"
+  readings_filename = f"readings/{helpers.date_string()}.csv"
   new_file = not helpers.file_exists(readings_filename)
   with open(readings_filename, "a") as f:
     if new_file:
